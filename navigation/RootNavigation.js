@@ -31,7 +31,11 @@ export default function RootNavigation() {
                                 headerShown:false
                             }}
                             name='Login' component={Login}/>
-                        <Stack.Screen name='SignUp' component={SignUp}/>
+                        <Stack.Screen
+                         options={{
+                            headerShown:false
+                         }}
+                         name='SignUp' component={SignUp}/>
                     </>
                 )
             }

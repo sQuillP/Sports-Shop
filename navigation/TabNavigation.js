@@ -14,7 +14,8 @@ export default function TabNavigation() {
                 options={{
                     tabBarIcon:({color, size})=> {
                         return <Ionicons name='home-outline' size={25}/>
-                    }
+                    },
+                    headerShown:false
                 }}
                 component={Home}/>
         </Tab.Navigator>

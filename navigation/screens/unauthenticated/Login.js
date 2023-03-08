@@ -8,15 +8,16 @@ import { login } from "../../../redux/slice/authSlice";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
+import InputField from "../../../components/InputField";
 
 const signInSchema = Yup.object().shape({
-    email: Yup.string().email().required('Email is required'),
-    password: Yup.string().required('Please provide password')
+    Email: Yup.string().email().required('Email is required'),
+    Password: Yup.string().required('Please provide password')
 });
 
 const initialValues = {
-    email:'',
-    password:'',
+    Email:'',
+    Password:'',
 };
 
 export default function Login() {
@@ -35,7 +36,7 @@ export default function Login() {
 
     return (
 
-            <SafeAreaView style={{flex: 1}}>
+            <SafeAreaView style={{flex: 1, backgroundColor:'white'}}>
             <KeyboardAvoidingView style={{flex:1}}>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <View style={styles.container}>
@@ -48,36 +49,29 @@ export default function Login() {
                             initialValues={initialValues}
                             validationSchema={signInSchema}
                             onSubmit={onLogin}
-                            
                         >
                             {({handleChange, handleBlur, handleSubmit, values, errors, submitCount })=> {
                                 return (
                                     <View style={{width:'85%', flex: 1, justifyContent:'space-around', alignItems:'center'}}>
                                         <View style={{width:"85%"}}>
-                                            <View style={styles.inputContainer}>
-                                                <Text style={styles.label}>Email</Text>
-                                                <View style={{flexDirection:'row'}}>
-                                                    <Ionicons name='mail-outline' size={25} color={GlobalStyles.primaryBlack}/>
-                                                    <TextInput 
-                                                        value={values.email}
-                                                        onChangeText={handleChange('email')}
-                                                        style={styles.input}
-                                                    />
-                                                </View>
-                                            </View>
-                                            <View style={styles.inputContainer}>
-                                                <Text style={styles.label}>Password</Text>
-                                                <View style={{flexDirection:'row'}}>
-                                                    <Ionicons name='lock-closed-outline' size={25} color={GlobalStyles.primaryBlack}/>
-                                                    <TextInput 
-                                                        value={values.password}
-                                                        secureTextEntry={true}
-                                                        onChangeText={handleChange('password')}
-                                                        style={styles.input}
-                                                    />
-                                                </View>
-                                            </View>
-                                            {submitCount > 0 && (errors.email || errors.password) && <Text style={styles.error}>Invalid email or password</Text>}
+                                            <InputField
+                                                name={"Email"}
+                                                value={values.Email}
+                                                handleChange={handleChange}
+                                                iconName={'mail-outline'}
+                                                error={errors.Email}
+                                                label={'Email'}
+                                            />
+                                            <InputField
+                                                name={'Password'}
+                                                value={values.Password}
+                                                handleChange={handleChange}
+                                                iconName={'lock-closed-outline'}
+                                                error={errors.Password}
+                                                isPassword={true}
+                                                label={'Password'}
+                                            />
+                                            {submitCount > 0 && (errors.Email || errors.Password) && <Text style={styles.error}>Invalid email or password</Text>}
                                             <TouchableOpacity onPress={navigateSignUp}>
                                                 <Text style={styles.signUpText}>Not a member yet? Tap here to sign up!</Text>
                                             </TouchableOpacity>
@@ -109,7 +103,8 @@ const styles = StyleSheet.create({
     },
     header: {
         fontSize: 35,
-        textAlign:'center'
+        textAlign:'center',
+        fontWeight:'bold',
     },
     logo: {
         height:130,
