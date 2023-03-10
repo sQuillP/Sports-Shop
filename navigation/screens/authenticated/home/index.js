@@ -1,4 +1,4 @@
-import { StyleSheet, Text, FlatList, ScrollView, View } from "react-native";
+import { StyleSheet, Text, FlatList, ScrollView, View,Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import ItemCard from "../../../../components/ItemCard";
@@ -107,6 +107,14 @@ export default function Home() {
                         }}
                     />
                 </View>
+                <View style={styles.thanks}>
+                    <Image 
+                        source={require("../../../../assets/nike-logo.webp")}
+                        style={{width: 120, height: 120}}
+                        resizeMode={'contain'}
+                    />
+                    <Text style={styles.thanksText}>Thank you for shopping with us.</Text>
+                </View>
             </ScrollView>
         </SafeAreaView>
     )
@@ -130,4 +138,13 @@ const styles= StyleSheet.create({
         marginVertical: 10,
         fontWeight:'bold'
     },
+    thanks: {
+        marginBottom: 30,
+        alignItems:'center'
+    },
+    thanksText: {
+        fontSize:15,
+        textAlign:'center',
+        fontWeight:'bold'
+    }
 });

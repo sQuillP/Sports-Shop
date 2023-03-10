@@ -1,8 +1,8 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Home from './screens/authenticated/home';
-
+import Shop from './screens/authenticated/shop/Shop'
 import Ionicons from '@expo/vector-icons/Ionicons';
-
+import ShopSearch from './screens/authenticated/shop/ShopSearch';
 const Tab = createBottomTabNavigator();
 
 export default function TabNavigation() {
@@ -17,7 +17,22 @@ export default function TabNavigation() {
                     },
                     headerShown:false
                 }}
-                component={Home}/>
+                component={Home}
+
+            />
+            <Tab.Screen
+                name="Shop"
+                options={{
+                    tabBarIcon:({color,size})=> {
+                        return <Ionicons size={25} name='search'/>
+                    },
+                    header:()=> {
+                        return <ShopSearch/>
+                    },
+                    tabBarHideOnKeyboard:true
+                }}
+                component={Shop}
+            />
         </Tab.Navigator>
     )
     

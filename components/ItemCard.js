@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     container: {
         overflow:'hidden',
         borderRadius: 10,
-        marginHorizontal: 5,
+        margin: 5,
         width: 125,
         backgroundColor:'white',
         shadowColor: '#000',

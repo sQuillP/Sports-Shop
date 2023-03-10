@@ -11,6 +11,7 @@ export default function App() {
     <Provider store={mainStore}>
       <SafeAreaProvider>
         <NavigationContainer>
+          <StatusBar style='dark'/>
           <RootNavigation/>
         </NavigationContainer>
       </SafeAreaProvider>
