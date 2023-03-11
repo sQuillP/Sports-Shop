@@ -4,6 +4,8 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import CategoryChip from "./CategoryChip";
+import { useDispatch } from "react-redux";
+import { changeCategory } from "../../../../redux/slice/itemCategorySlice";
 
 const categories = [
     {name:'Shoes', id: 1},
@@ -14,12 +16,18 @@ const categories = [
 export default function ShopSearch(){
 
     const [searchTerm, updateSearchTerm] = useState('');
-    const [showSearch, updateShowSearch] = useState('');
     const [category, updateSelectedCategory] = useState('Shoes');
     const navigation = useNavigation();
+    const dispatch = useDispatch();
 
+    function onUpdateSelectedCategory(selectedCategory) {
 
+        if(selectedCategory === category)
+            return;
 
+        dispatch(changeCategory(selectedCategory));
+        updateSelectedCategory(selectedCategory);
+    }
 
     function onNavigateFilterSettings() {
         navigation.navigate('Filter');
@@ -46,7 +54,7 @@ export default function ShopSearch(){
                         return (
                             <CategoryChip
                                 label={item.name}
-                                onPress={updateSelectedCategory}
+                                onPress={onUpdateSelectedCategory}
                                 selected= {category === item.name}
                             />
                         )

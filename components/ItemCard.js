@@ -1,20 +1,23 @@
-import { StyleSheet, Image, View, Text } from "react-native";
-
-
+import { StyleSheet, Image, View, Text, TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 
 export default function ItemCard({uri, name, price}) {
 
+    const navigation = useNavigation();
 
+    function onNavigate(){
+        navigation.navigate('ViewItem',{item:{uri,name,price}});
+    }
 
     return (
-        <View style={styles.container}>
+        <TouchableOpacity onPress={onNavigate} style={styles.container}>
             <Image style={styles.image} source={{uri}}/>
             <View style={styles.productInfo}>
                 <Text style={styles.name}>{name}</Text>
                 <Text style={styles.price}>${price}</Text>
             </View>
-        </View>
+        </TouchableOpacity>
     )
 }
 
@@ -23,7 +26,7 @@ const styles = StyleSheet.create({
         overflow:'hidden',
         borderRadius: 10,
         margin: 5,
-        width: 125,
+        width: 150,
         backgroundColor:'white',
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
@@ -33,7 +36,7 @@ const styles = StyleSheet.create({
         
     },
     image: {
-        height: 125,
+        height: 150,
         width: '100%',
         resizeMode:'cover'
     },

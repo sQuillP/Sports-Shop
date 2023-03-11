@@ -4,7 +4,9 @@ import TabNavigation from './TabNavigation';
 import { useSelector } from 'react-redux';
 import SignUp from './screens/unauthenticated/Signup';
 import Filter from './screens/authenticated/FilterSearch/Filter';
-import { Platform } from 'react-native';
+import ViewItem from './screens/authenticated/ViewItem/ViewItem';
+
+
 const Stack = createNativeStackNavigator();
 
 export default function RootNavigation() {
@@ -34,6 +36,17 @@ export default function RootNavigation() {
                         
                         component={Filter}
                     />
+                    <Stack.Screen 
+                        options={{
+                            presentation:'modal',
+                            title: 'View Item',
+                            headerTitleStyle:{
+                                fontSize: 20,
+                            },
+                        }} 
+                        name="ViewItem"
+                        component={ViewItem}
+                    />
                 </>):(
                     <>
                         <Stack.Screen 
@@ -43,10 +56,10 @@ export default function RootNavigation() {
                             name='Login' component={Login}
                         />
                         <Stack.Screen
-                         options={{
-                            headerShown:false
-                         }}
-                         name='SignUp' component={SignUp}
+                            options={{
+                                headerShown:false
+                            }}
+                            name='SignUp' component={SignUp}
                          />
                     </>
                 )
