@@ -2,7 +2,7 @@ import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 
 
 const initialState = {
-    token: null
+    token: "token"
 }
 
 const authSlice = createSlice({

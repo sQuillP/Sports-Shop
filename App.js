@@ -5,7 +5,6 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Provider } from 'react-redux';
 import RootNavigation from './navigation/RootNavigation';
 import { mainStore } from './redux/store/store';
-
 export default function App() {
   return (
     <Provider store={mainStore}>

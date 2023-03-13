@@ -5,7 +5,8 @@ import { useSelector } from 'react-redux';
 import SignUp from './screens/unauthenticated/Signup';
 import Filter from './screens/authenticated/FilterSearch/Filter';
 import ViewItem from './screens/authenticated/ViewItem/ViewItem';
-
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { Pressable } from 'react-native';
 
 const Stack = createNativeStackNavigator();
 
@@ -13,7 +14,6 @@ export default function RootNavigation() {
 
     const {token} = useSelector((store)=> store.auth);
 
-    //handle sign in logic here.
 
     return (
         <Stack.Navigator>
@@ -37,13 +37,23 @@ export default function RootNavigation() {
                         component={Filter}
                     />
                     <Stack.Screen 
-                        options={{
-                            presentation:'modal',
-                            title: 'View Item',
-                            headerTitleStyle:{
-                                fontSize: 20,
-                            },
-                        }} 
+                        options={
+                            ({navigation})=> ({
+                                presentation:'modal',
+                                title: 'View Item',
+                                headerTitleStyle:{
+                                    fontSize: 20,
+                                },
+                                headerTitleAlign:'center',
+                                headerLeft:(props)=> {
+                                    return (
+                                        <Pressable onPress={()=> navigation.goBack()}>
+                                            <Ionicons name='close-outline' size={30} color='black' />
+                                        </Pressable>
+                                    )
+                                }
+                            })
+                        } 
                         name="ViewItem"
                         component={ViewItem}
                     />
@@ -57,7 +67,7 @@ export default function RootNavigation() {
                         />
                         <Stack.Screen
                             options={{
-                                headerShown:false
+                                headerShown:false,
                             }}
                             name='SignUp' component={SignUp}
                          />

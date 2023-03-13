@@ -24,7 +24,6 @@ export default function Ratings() {
             <View style={styles.container}>
                 {
                     ratingsArray.map(rating=> {
-                        console.log((ratings[rating]/totalRatings)*100)
                         const percent = Math.floor((ratings[rating]/totalRatings)*100);
 
                         return (

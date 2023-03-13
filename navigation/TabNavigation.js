@@ -1,12 +1,20 @@
+import { View, Text } from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Home from './screens/authenticated/home';
 import Shop from './screens/authenticated/shop/Shop'
 import Ionicons from '@expo/vector-icons/Ionicons';
 import ShopSearch from './screens/authenticated/shop/ShopSearch';
+import Bag from './screens/authenticated/bag/Bag';
+import { Feather } from '@expo/vector-icons'; 
+import { StyleSheet } from 'react-native';
+import { useSelector } from 'react-redux';
+
 const Tab = createBottomTabNavigator();
 
 export default function TabNavigation() {
 
+    const bagQuantity = useSelector((store)=> store.bag.items.length) || 500;
+    console.log(bagQuantity)
     return (
         <Tab.Navigator>
             <Tab.Screen
@@ -33,7 +41,47 @@ export default function TabNavigation() {
                 }}
                 component={Shop}
             />
+            <Tab.Screen
+                name='Bag'
+                options={{
+                    headerShown:true,
+                    title:'Bag',
+                    tabBarIcon:({color,size})=> {
+                        return (
+                            <View style={styles.bagContainer}>
+                                <Feather name="shopping-bag" size={24} color="black" />
+                                <View style={styles.bagQuantity}>
+                                    <Text style={styles.quantityText}>{bagQuantity > 99? '+': bagQuantity}</Text>
+                                </View>
+                            </View>
+                        )
+                    }
+                }}
+                component={Bag}
+            />
         </Tab.Navigator>
-    )
-    
+    )   
 }
+
+const styles = StyleSheet.create({
+    bagContainer: {
+        position:'relative'
+    },
+    bagQuantity: {
+        height: 20,
+        width:20,
+        borderRadius: 10,
+        position:'absolute',
+        top:-3,
+        right: -10,
+        backgroundColor:'red',
+        justifyContent:'center',
+        alignItems:'center'
+    },
+    quantityText:{
+        color:'white',
+        fontWeight:'bold',
+        textAlign:'center',
+        fontSize: 10
+    }
+})

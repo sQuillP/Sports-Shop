@@ -4,13 +4,19 @@ import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 
 
 
-export default function Expandable() {
+export default function Expandable({children}) {
 
     const [isOpen, updateIsOpen] = useState(false);
 
-    return (
-        <TouchableOpacity style={styles.container}>
+    function onUpdateOpen() {
+        updateIsOpen(!isOpen);
+    }
 
+    return (
+        <TouchableOpacity onPress={onUpdateOpen} style={styles.container}>
+            <>
+                {children}
+            </>
         </TouchableOpacity>
     );
 
