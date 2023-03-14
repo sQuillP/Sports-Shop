@@ -57,6 +57,13 @@ export default function RootNavigation() {
                         name="ViewItem"
                         component={ViewItem}
                     />
+                    <Stack.Screen
+                        name='Checkout'
+                        options={{
+
+                        }}
+                        
+                    />
                 </>):(
                     <>
                         <Stack.Screen 

@@ -8,6 +8,8 @@ import Bag from './screens/authenticated/bag/Bag';
 import { Feather } from '@expo/vector-icons'; 
 import { StyleSheet } from 'react-native';
 import { useSelector } from 'react-redux';
+import { AntDesign } from '@expo/vector-icons'; 
+import Favorites from './screens/authenticated/favorites/Favorites';
 
 const Tab = createBottomTabNavigator();
 
@@ -51,13 +53,22 @@ export default function TabNavigation() {
                             <View style={styles.bagContainer}>
                                 <Feather name="shopping-bag" size={24} color="black" />
                                 <View style={styles.bagQuantity}>
-                                    <Text style={styles.quantityText}>{bagQuantity > 99? '+': bagQuantity}</Text>
+                                    <Text style={styles.quantityText}>{bagQuantity > 99? '99+': bagQuantity}</Text>
                                 </View>
                             </View>
                         )
                     }
                 }}
                 component={Bag}
+            />
+            <Tab.Screen 
+                name='Favorites'
+                options={{
+                    tabBarIcon:()=> {
+                        return <AntDesign name="hearto" size={25} color="black" />
+                    }
+                }}
+                component={Favorites}
             />
         </Tab.Navigator>
     )   
