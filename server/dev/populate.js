@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const connectDB = require("../db/dbConnect");
 const Item = require("../schema/StoreItem");
-const seed = require("./dummyData");
+const seed = require("./shoeData");
 
 
 async function seedData() {

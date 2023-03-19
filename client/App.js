@@ -5,11 +5,12 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Provider } from 'react-redux';
 import RootNavigation from './navigation/RootNavigation';
 import { mainStore } from './redux/store/store';
-import {StripeProvider} from '@stripe/stripe-react-native'
+import {StripeProvider} from '@stripe/stripe-react-native';
+import { STRIPE_PUBLIC_KEY } from './stripe/stripe.config';
 export default function App() {
   return (
     <StripeProvider
-      publishableKey='key'
+      publishableKey={STRIPE_PUBLIC_KEY}
       merchantIdentifier='merchant.identifier'
     >
       <Provider store={mainStore}>

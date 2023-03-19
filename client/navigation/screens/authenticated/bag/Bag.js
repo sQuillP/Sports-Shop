@@ -4,6 +4,7 @@ import { GlobalStyles } from "../../../../globals/styles";
 import BagItem from "./BagItem";
 import { AntDesign } from '@expo/vector-icons'; 
 import { useNavigation } from "@react-navigation/native";
+import Checkout from "../checkout/Checkout";
 
 
 const itemData1 = [
@@ -20,7 +21,7 @@ export default function Bag() {
 
 
     function onCheckout() {
-        // navigator.navigate('checkout');
+        navigator.navigate('Checkout');
     }
 
     return (
@@ -41,10 +42,7 @@ export default function Bag() {
                     <Text style={styles.footerTitle}>Total Amount</Text>
                     <Text style={styles.footerTitle}>$232</Text>
                 </View>
-                <TouchableOpacity onPress={onCheckout} activeOpacity={0.6}  style={styles.checkout}>
-                    <Text style={styles.btnText}>Checkout</Text>
-                    <AntDesign name="checkcircleo" size={20} color="white" />
-                </TouchableOpacity>
+                <Checkout/>
             </View>
         </View>
     );
