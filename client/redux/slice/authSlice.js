@@ -2,7 +2,7 @@ import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 
 
 const initialState = {
-    token: "token"
+    user:null
 }
 
 const authSlice = createSlice({
@@ -10,13 +10,13 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         login:(state, action)=> {
-            state.token = action.payload;
+            state.user = action.payload;
         },
         signUp:(state,action)=> {
-            state.token = action.payload;
+            state.user = action.payload;
         },
         logout:(state,action)=> {
-            state.token = null;
+            state.user= null;
         }
     }
 });

@@ -1,32 +1,46 @@
 import { StyleSheet, Text, FlatList, ScrollView, View,Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
+import axios from 'axios'
 import ItemCard from "../../../../components/ItemCard";
 import Panel from "./Panel";
-
-const itemData = [
-    {name:"Nike Air Jordan 1 Mid", price: 125, uri:'https://static.nike.com/a/images/t_PDP_1728_v1/0e7fc8f3-76b7-4631-b147-4dad4b1ff241/air-jordan-1-mid-shoes-X5pM09.png', id:1},
-    {name:"Nike Air Jordan 1 Mid", price: 125, uri:'https://static.nike.com/a/images/t_PDP_1728_v1/0e7fc8f3-76b7-4631-b147-4dad4b1ff241/air-jordan-1-mid-shoes-X5pM09.png', id:2},
-    {name:"Nike Air Jordan 1 Mid", price: 125, uri:'https://static.nike.com/a/images/t_PDP_1728_v1/0e7fc8f3-76b7-4631-b147-4dad4b1ff241/air-jordan-1-mid-shoes-X5pM09.png', id:3},
-    {name:"Nike Air Jordan 1 Mid", price: 125, uri:'https://static.nike.com/a/images/t_PDP_1728_v1/0e7fc8f3-76b7-4631-b147-4dad4b1ff241/air-jordan-1-mid-shoes-X5pM09.png', id:4},
-];
-
-const itemData2 = [
-    {name:'Plain White T Jersy', price: 55, uri: 'https://static.fibre2fashion.com/MemberResources/LeadResources/1/2018/4/Seller/18146349/Images/18146349_0_plain-sports-t-shirts-for-men.png', id:1},
-    {name:'Plain White T Jersy', price: 55, uri: 'https://static.fibre2fashion.com/MemberResources/LeadResources/1/2018/4/Seller/18146349/Images/18146349_0_plain-sports-t-shirts-for-men.png', id:2},
-    {name:'Plain White T Jersy', price: 55, uri: 'https://static.fibre2fashion.com/MemberResources/LeadResources/1/2018/4/Seller/18146349/Images/18146349_0_plain-sports-t-shirts-for-men.png', id:3},
-    {name:'Plain White T Jersy', price: 55, uri: 'https://static.fibre2fashion.com/MemberResources/LeadResources/1/2018/4/Seller/18146349/Images/18146349_0_plain-sports-t-shirts-for-men.png', id:4},
-];
-
-const itemData3 = [
-    {name:'Phantom Black Hoodie', price: 60, uri:'https://cdn.shopify.com/s/files/1/0323/1157/products/3HS_BX_02_637511360835387086.jpg?v=1626164103', id:1},
-    {name:'Phantom Black Hoodie', price: 60, uri:'https://cdn.shopify.com/s/files/1/0323/1157/products/3HS_BX_02_637511360835387086.jpg?v=1626164103', id:2},
-    {name:'Phantom Black Hoodie', price: 60, uri:'https://cdn.shopify.com/s/files/1/0323/1157/products/3HS_BX_02_637511360835387086.jpg?v=1626164103', id:3},
-    {name:'Phantom Black Hoodie', price: 60, uri:'https://cdn.shopify.com/s/files/1/0323/1157/products/3HS_BX_02_637511360835387086.jpg?v=1626164103', id:4},
-]
-
+import { useEffect, useState } from "react";
 
 export default function Home() {
+
+    const [clothingDisplay, setClothingDisplay] = useState([]);
+    const [shoeDisplay, setShoeDisplay] = useState([]);
+    const [gearDisplay, setGearDisplay] = useState([]);
+
+
+    async function getItemsDisplay() {
+        const URL = 'http://10.0.2.2:3000/items';
+        const params = {params:{limit:5}};
+        const shoes = axios.get(`${URL}/shoes`,params);
+        const clothing = axios.get(`${URL}/clothing`,params);
+        const equipment = axios.get(`${URL}/equipment`, params);
+        try{
+            let mappedResults = (await Promise.all([shoes,clothing,equipment])).map(result => result.data.data);
+            return mappedResults;
+        } catch(error) {
+            console.log(error.message)
+            return [[],[],[]];
+        }
+    }
+
+
+    useEffect(()=> {
+        let mounted = true;
+        (async ()=>{
+            console.log('getting items')
+            let [shoes, clothing, gear] = await getItemsDisplay();
+            if(mounted) {
+                setShoeDisplay(shoes);
+                setClothingDisplay(clothing);
+                setGearDisplay(gear)
+            }
+        })();
+        return ()=> mounted = false;
+    },[setShoeDisplay, setClothingDisplay, setGearDisplay]);
 
     return (
         <SafeAreaView>
@@ -37,14 +51,14 @@ export default function Home() {
                 <View style={styles.productSection}>
                     <Text style={styles.textIntro}>Products you may like</Text>
                     <FlatList
-                        data={itemData}
+                        data={shoeDisplay}
                         horizontal={true}
-                        keyExtractor={(item)=> item.id}
+                        keyExtractor={(item)=> item._id}
                         showsHorizontalScrollIndicator={false}
                         renderItem={({item})=> {
                             return (
                                 <ItemCard
-                                    uri={item.uri}
+                                    uri={item.image}
                                     name={item.name}
                                     price={item.price}
                                 />
@@ -72,16 +86,16 @@ export default function Home() {
                     image={"https://static.nike.com/a/images/f_auto/dpr_1.0,cs_srgb/w_593,c_limit/800dd287-7255-423c-b2ed-72e220ca5c48/nike-just-do-it.jpg"}
                 />
                 <View style={styles.productSection}>
-                    <Text style={styles.textIntro}>Shop Hoodies</Text>
+                    <Text style={styles.textIntro}>Shop Clothing</Text>
                     <FlatList
-                        data={itemData2}
+                        data={clothingDisplay}
                         horizontal={true}
                         showsHorizontalScrollIndicator={false}
-                        keyExtractor={(item)=> item.id}
+                        keyExtractor={(item)=> item._id}
                         renderItem={({item})=> {
                             return (
                                 <ItemCard
-                                    uri={item.uri}
+                                    uri={item.image}
                                     name={item.name}
                                     price={item.price}
                                 />
@@ -90,16 +104,16 @@ export default function Home() {
                     />
                 </View>
                 <View style={styles.productSection}>
-                    <Text style={styles.textIntro}>Browse T Shirts</Text>
+                    <Text style={styles.textIntro}>Browse Gear</Text>
                     <FlatList
-                        keyExtractor={(item)=> item.id}
-                        data={itemData3}
+                        keyExtractor={(item)=> item._id}
+                        data={gearDisplay}
                         horizontal={true}
                         showsHorizontalScrollIndicator={false}
                         renderItem={({item})=> {
                             return (
                                 <ItemCard
-                                    uri={item.uri}
+                                    uri={item.image}
                                     name={item.name}
                                     price={item.price}
                                 />

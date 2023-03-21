@@ -7,6 +7,10 @@ import RootNavigation from './navigation/RootNavigation';
 import { mainStore } from './redux/store/store';
 import {StripeProvider} from '@stripe/stripe-react-native';
 import { STRIPE_PUBLIC_KEY } from './stripe/stripe.config';
+
+
+
+
 export default function App() {
   return (
     <StripeProvider

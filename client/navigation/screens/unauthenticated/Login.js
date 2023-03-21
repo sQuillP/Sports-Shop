@@ -9,6 +9,8 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import InputField from "../../../components/InputField";
+import {auth} from '../../../firebase/firebase.config';
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 const signInSchema = Yup.object().shape({
     Email: Yup.string().email().required('Email is required'),
@@ -29,9 +31,15 @@ export default function Login() {
         navigation.navigate('SignUp');
     }
  
-    function onLogin(credentials) {
+    async function onLogin(credentials) {
         console.log(credentials)
-        dispatch(login(credentials));
+        try{
+            const response = await signInWithEmailAndPassword(auth,credentials.email, credentials.password);
+            const user = response.user;
+            dispatch(login(user));
+        } catch(error){
+            console.log('unable to sign in');
+        }
     }
 
     return (

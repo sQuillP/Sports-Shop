@@ -5,7 +5,7 @@ import BagItem from "./BagItem";
 import { AntDesign } from '@expo/vector-icons'; 
 import { useNavigation } from "@react-navigation/native";
 import Checkout from "../checkout/Checkout";
-
+import {db} from "../../../../firebase/firebase.config";
 
 const itemData1 = [
     {name:"Nike Air Jordan 1 Mid", quantity:1, price: 125, uri:'https://static.nike.com/a/images/t_PDP_1728_v1/0e7fc8f3-76b7-4631-b147-4dad4b1ff241/air-jordan-1-mid-shoes-X5pM09.png', id:1},

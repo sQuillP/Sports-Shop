@@ -16,7 +16,6 @@ const Tab = createBottomTabNavigator();
 export default function TabNavigation() {
 
     const bagQuantity = useSelector((store)=> store.bag.items.length) || 500;
-    console.log(bagQuantity)
     return (
         <Tab.Navigator>
             <Tab.Screen

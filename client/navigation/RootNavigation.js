@@ -7,14 +7,13 @@ import Filter from './screens/authenticated/FilterSearch/Filter';
 import ViewItem from './screens/authenticated/ViewItem/ViewItem';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Pressable } from 'react-native';
-import Checkout from './screens/authenticated/checkout/Checkout';
 
 const Stack = createNativeStackNavigator();
 
 export default function RootNavigation() {
 
     const {token} = useSelector((store)=> store.auth);
-
+    
 
     return (
         <Stack.Navigator>

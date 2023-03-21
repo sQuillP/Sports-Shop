@@ -12,20 +12,22 @@ export default function Checkout() {
     const [loading, setLoading] = useState(false);
   
     const fetchPaymentSheetParams = async () => {
-      const response = await fetch(`${API_URL}/payment-sheet`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      const { paymentIntent, ephemeralKey, customer} = await response.json();
-      const res = await response.json();
-      console.log(res);
-      return {
-        paymentIntent,
-        ephemeralKey,
-        customer,
-      };
+      try{
+        const response = await fetch(`${API_URL}/payment-sheet`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        const { paymentIntent, ephemeralKey, customer} = await response.json();
+        return {
+          paymentIntent,
+          ephemeralKey,
+          customer,
+        };
+      } catch(error) {
+        console.log(error.message);
+      }
     };
   
     const initializePaymentSheet = async () => {
@@ -64,6 +66,8 @@ export default function Checkout() {
         } else {
             Alert.alert('Success', 'Your order is confirmed!');
             //clear the cart and all items
+            //Get a new payment sheet/payment intent, you cannot use the same payment intent
+            await initializePaymentSheet();
         }
     };
 
@@ -73,8 +77,6 @@ export default function Checkout() {
   
     return (
         <TouchableOpacity
-          variant="primary"
-          title="Checkout"
           onPress={openPaymentSheet}
           activeOpacity={0.7}
           style={styles.container}

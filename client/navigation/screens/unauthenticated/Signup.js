@@ -8,11 +8,15 @@ import { Formik } from "formik";
 import InputField from "../../../components/InputField";
 import { GlobalStyles } from "../../../globals/styles";
 import { signUp } from "../../../redux/slice/authSlice";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import {db, auth} from '../../../firebase/firebase.config';
+import { ref, set } from "firebase/database";
+
+
 
 const formSchema= Yup.object().shape({
     email: Yup.string().email().required("Please provide an email"),
-    password: Yup.string()
-        .length(5, "Length must be 5 characters")
+    password: Yup.string().min(5, "Length must be at least characters")
         .required("Please provide a password"),
     firstName: Yup.string()
         .required("Must provide a name"),
@@ -33,9 +37,21 @@ export default function SignUp() {
     const dispatch = useDispatch();
     const navigation = useNavigation();
 
-    function onRegister(form) {
+    async function onRegister(form) {
         console.log('submitting form', form);
-        dispatch(signUp(form));
+
+        try{
+            const response = await createUserWithEmailAndPassword(auth,form.email,form.password);
+            const user = response.user;
+            console.log(user);
+            dispatch(signUp(user));
+
+            //write new user to database
+            await set(ref(db,`/users/${user.uid}`),form);
+        } catch(error) {
+            console.log(error.message);
+            console.log('unable to sign up')
+        }
     }
 
 
@@ -63,6 +79,7 @@ export default function SignUp() {
                         >
                             {
                                 ({touched, errors, values, submitCount, handleChange, handleSubmit})=> {
+                                    console.log(errors);
                                     return (
                                         <View style={styles.formContainer}>
                                             <View style={styles.fields}>
@@ -92,7 +109,7 @@ export default function SignUp() {
                                                     handleChange={handleChange}
                                                     label={'Last Name'}
                                                     name={'lastName'}
-                                                    value={values.firstName}
+                                                    value={values.lastName}
                                                 />
                                             </View>
                                             {submitCount > 0 && (!!Object.keys(errors).length) && <Text style={{color:'red',fontSize:20}}>Please provide correct values</Text>}

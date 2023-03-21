@@ -4,11 +4,13 @@ import { GlobalStyles } from '../../../../globals/styles'
 
 
 
-export default function CategoryChip({onPress, label, selected}) {
+export default function CategoryChip({onPress, label, selection, selected}) {
 
     function onPressChip() {
-        onPress(label);
+        onPress(selection);
     }
+
+
 
     return (
         <Pressable style={[styles.container, {backgroundColor: selected?'white':GlobalStyles.primaryBlack}]} onPress={onPressChip}>

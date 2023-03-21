@@ -1,24 +1,29 @@
 import { StyleSheet, Text, TextInput, View, Pressable, ScrollView, FlatList } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import CategoryChip from "./CategoryChip";
 import { useDispatch } from "react-redux";
 import { changeCategory } from "../../../../redux/slice/itemCategorySlice";
+import { searchItem } from "../../../../redux/slice/itemCategorySlice";
 
 const categories = [
-    {name:'Shoes', id: 1},
-    {name:'Clothing', id: 2},
-    {name:'Sports Wear', id: 3},
+    {name:'Shoes', selection:'shoes', id: 1},
+    {name:'Clothing', selection:'clothing', id: 2},
+    {name:'Sports Gear', selection:'equipment', id: 3},
 ];
 
 export default function ShopSearch(){
 
     const [searchTerm, updateSearchTerm] = useState('');
-    const [category, updateSelectedCategory] = useState('Shoes');
+    const [category, updateSelectedCategory] = useState('shoes');
     const navigation = useNavigation();
     const dispatch = useDispatch();
+
+    useEffect(()=> {
+        dispatch(searchItem({name:category, options:{limit:25}}));
+    },[])
 
     function onUpdateSelectedCategory(selectedCategory) {
 
@@ -26,6 +31,7 @@ export default function ShopSearch(){
             return;
 
         dispatch(changeCategory(selectedCategory));
+        dispatch(searchItem({name:selectedCategory, options:{params:{limit:25}}}));
         updateSelectedCategory(selectedCategory);
     }
 
@@ -54,8 +60,9 @@ export default function ShopSearch(){
                         return (
                             <CategoryChip
                                 label={item.name}
+                                selection={item.selection}
                                 onPress={onUpdateSelectedCategory}
-                                selected= {category === item.name}
+                                selected= {category === item.selection}
                             />
                         )
                     }}

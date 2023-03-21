@@ -11,6 +11,7 @@ export const mainStore = configureStore({
         category: categoryReducer,
         bag: bagReducer
     },
+    middleware:(getDefaultMiddleware)=> getDefaultMiddleware({serializableCheck: false})
 });
 
 
