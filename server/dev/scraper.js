@@ -1,14 +1,16 @@
 const puppeteer = require('puppeteer');
-const Item = require("../schema/StoreItem");
-
-const SCRAPE_URL = 'https://www.nike.com/w/unisex-shoes-3rauvzy7ok';
-const cardSelector = '.product-card__link-overlay';
 
 
-(async ()=> {
+const shoeSizes = ["6","6.5","7","7.5","8","8.5","9","9.5","10","10.5","11"];
+const clothingSizes = ["XS","SM","MD","LG","XL","XXL"];
+const availableColors = ['white',"red","salmon","orange","gold","green","lightblue","purple"];
+
+/* Scrape any url page that displays items */
+async function scrape(SCRAPE_URL, CATEGORY){
+
     const browser = await puppeteer.launch({headless:false});
     const page = await browser.newPage();
-    await page.goto(SCRAPE_URL,{waitUntil:'domcontentloaded'});
+    await page.goto(SCRAPE_URL,{waitUntil:['domcontentloaded']});
     const scrapedData = [];
     //scrape the sub link
     async function scrapeLink(link) {
@@ -17,9 +19,7 @@ const cardSelector = '.product-card__link-overlay';
         const descriptionSelector = '.description-preview.body-2.css-1pbvugb > p';
         await page.goto(link,{waitUntil:'domcontentloaded'});
         const name = await page.$eval(nameSelector,(el)=> el.textContent);
-        console.log(name);
         const description = await page.$eval(descriptionSelector,(el)=> el.textContent);
-        console.log(description);
         return {
             name,
             description
@@ -28,43 +28,57 @@ const cardSelector = '.product-card__link-overlay';
 
     const imageSelector = '.product-card__hero-image';
     const priceSelector = '.is--current-price';
+    const cardSelector = '.product-card__link-overlay';
 
-    console.log('grabbing images')
     //grab all images
     await page.waitForSelector(imageSelector);
     const imageList = await page.$$eval(imageSelector,(images)=>(
-        Array.from(images).map(image=> image.getAttribute('src'))
+        images.map(image=> image.getAttribute('src'))
     ));
 
-    console.log('getting prices');
     //grab all prices
     await page.waitForSelector(priceSelector);
     const priceList = await page.$$eval(priceSelector,(prices)=>(
-        Array.from(prices).map(price => price.textContent)
+        prices.map(price => price.textContent)
     ));
 
 
-    console.log('navigating to links')
     //get links from all images
     await page.waitForSelector(cardSelector);
     const links = await page.$$eval(cardSelector,(cards)=>(
         cards.map((card)=>card.getAttribute('href'))
     ));
 
-    console.log('putting everything together...')
     console.log(links.length, imageList.length, priceList.length);
     for(let i = 0; i<links.length; i++){
-        const storeItem = {
-            image: imageList[i],
-            price:priceList[i],
-        };
-        const {name, description} =  await scrapeLink(links[i], storeItem);
-        storeItem['name'] = name;
-        storeItem['description'] = description;
-        scrapedData.push(storeItem);
+        try {
+            const linkData =  await scrapeLink(links[i]);
+            const storeItem = {
+                ...linkData,
+                sizes: CATEGORY==='shoes'?shoeSizes:clothingSizes,
+                image: imageList[i],
+                price:Number(priceList[i].substring(1)),
+                ratings:{
+                    "1": Math.floor(Math.random()*5),
+                    "2": Math.floor(Math.random()*10),
+                    "3": Math.floor(Math.random()*20),
+                    "4":Math.floor(Math.random()*40),
+                    "5":Math.floor(Math.random()*80)
+                },
+                inventoryCount: Math.floor(Math.random()*100) + 10,
+                colors: availableColors,
+                category:CATEGORY
+            };
+            scrapedData.push(storeItem);
+            console.log(i+1);
+        } catch(error) {
+            console.log(error.message);
+            process.exit(1);
+        }
     }
-
-    console.log(scrapedData);
- 
     await browser.close();
-})();
+    return scrapedData;
+};
+
+
+module.exports = scrape;

@@ -5,13 +5,21 @@ const dbConnect = require("./db/dbConnect");
 const dotenv = require("dotenv");
 dotenv.config({path:"./environments/environments.env"});
 
+const validateToken = require("./middleware/validateToken");
+
 const cors = require('cors');
 app.use(cors({origin:"*"}));
 
 const Stripe = require("stripe");
 const stripe = Stripe(process.env.STRIPE_PRIVATE_KEY,{apiVersion: "2020-08-27"})
 
+const StoreItem = require('./schema/StoreItem');
+const { response } = require("express");
+
 dbConnect();
+
+//apply user validation to access endpoints
+// app.use(validateToken);
 
 app.post('/payment-sheet', async (req, res) => {
     // Use an existing Customer ID if this is a returning customer.
@@ -43,6 +51,31 @@ app.post('/payment-sheet', async (req, res) => {
     });
   });
 
+
+  app.get('/items/:category', async (req,res,next)=> {
+
+    let limit = 10;
+
+    let query = StoreItem.find({
+      category: req.params.category,
+    });
+
+    if(req.query.name){
+      query = query.where('name',new RegExp(req.query.name,"gi"));
+    }
+
+    if(req.query.limit){
+      limit = req.query.limit;
+    }
+
+    const responseData = await query.limit(limit);
+
+    res.status(200).json({
+      itemCount: responseData.length,
+      data: responseData
+    });
+
+  });
 
 
 app.listen(3000,()=> {
