@@ -2,20 +2,20 @@ import { StyleSheet, Image, View, Text, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 
-export default function ItemCard({uri, name, price}) {
+export default function ItemCard({item}) {
 
     const navigation = useNavigation();
 
     function onNavigate(){
-        navigation.navigate('ViewItem',{item:{uri,name,price}});
+        navigation.navigate('ViewItem',{item});
     }
 
     return (
         <TouchableOpacity onPress={onNavigate} style={styles.container}>
-            <Image style={styles.image} source={{uri}}/>
+            <Image style={styles.image} source={{uri: item.image}}/>
             <View style={styles.productInfo}>
-                <Text style={styles.name}>{name}</Text>
-                <Text style={styles.price}>${price}</Text>
+                <Text style={styles.name}>{item.name}</Text>
+                <Text style={styles.price}>${item.price}</Text>
             </View>
         </TouchableOpacity>
     )

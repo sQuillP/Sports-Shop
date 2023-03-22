@@ -19,7 +19,7 @@ const calcNumColumns = (width) => {
 export default function Shop() {
 
     const { category, fetchingResults, items } = useSelector((store)=> store.category);
-    const {width} = Dimensions.get('window')
+    const {width} = Dimensions.get('window');
     const [itemData, updateItemData] = useState([]);
     console.log(fetchingResults)
     useEffect(()=> {
@@ -44,9 +44,7 @@ export default function Shop() {
                         renderItem={({item})=> {
                             return (
                                 <ItemCard
-                                    name={item.name}
-                                    price={item.price}
-                                    uri={item.image}
+                                    item={item}
                                 />
                             );
                         }}

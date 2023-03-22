@@ -6,41 +6,37 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import QuantityIncrementor from './QuantityIncrementor';
 import ModalContent from './ModalContent';
 import { GlobalStyles } from '../../../../globals/styles';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addToBag } from '../../../../redux/slice/bagSlice';
-const colorCodes = [
-    "salmon", //red
-    "#FFD580", //orange,
-    "gold", //yellow,
-    "lime",//green
-    "lightblue",//blue,
-    "blue"
-];
-
-const sizes = [
-    "xs",
-    "sm",
-    "md",
-    "lg",
-    "xl",
-    "xxl"
-];
-
-
+import { db } from "../../../../firebase/firebase.config"
+import { set, ref, get, onValue } from "firebase/database";
+import formatSize from '../../../../util/formatSize';
 export default function ViewItem() {
 
     const {item} = useRoute().params;
+    const {user} = useSelector((store)=> store.auth);
     const navigation = useNavigation();
     const [quantity, updateQuantity] = useState(1);
-    const [pickedColor, updatePickedColor] = useState(colorCodes[0]);
-    const [pickedSize, updatePickedSize] = useState(sizes[0]);
+    const [pickedColor, updatePickedColor] = useState(item.colors[0]);
+    const [pickedSize, updatePickedSize] = useState(item.sizes[0]);
     const [showModal, updateShowModal] = useState(false);
+    const [successAdd, updateSuccessAdd] = useState(true);
+    const [isFavorited, updateIsFavorited] = useState(true);
     const dispatch = useDispatch();
 
 
     useEffect(()=> {
         navigation.setOptions({title: item.name});
     },[item]);
+
+    useEffect(()=> {
+        const favoritedRef = ref(db,`/favorites/${user.uid}/${item._id}`);
+        const favoritedListener = onValue(favoritedRef,(snapshot)=> {
+            console.log('is favorited ',snapshot.exists());
+            updateIsFavorited(snapshot.exists());
+        });
+        return favoritedListener;
+    },[]);
 
     function onSelectColor(color) {
 
@@ -51,17 +47,38 @@ export default function ViewItem() {
         return ()=> updatePickedSize(size);
     }
 
-    function onAddToBag() {
-        updateQuantity(1);
-        updateShowModal(true);
-        // dispatch(addToBag(item));
-        //dispatch redux and add to bag with product information
-        
+
+    //when a user adds an item to the bag
+    async function onAddToBag() {
+        const bagItem = {
+            ...item,
+            quantity,
+            pickedColor,
+            pickedSize,
+        };
+        //add specific properties for each bag item entry
+        const bagRef = ref(db,`/bag/${user.uid}/${item._id}_${pickedColor}_${formatSize(pickedSize)}`);
+        try{
+            await set(bagRef,bagItem);
+            updateSuccessAdd(true);
+        } catch(error) {
+            updateSuccessAdd(false);
+        } finally {
+            updateShowModal(true);
+        }
     }
 
-
-    function onFavorite() {
+    //When a user adds item to favorites
+    async function onFavorite() {
+        if(isFavorited) return;
         //use firebase to add product to favorites
+        const favoriteRef = ref(db,`/favorites/${user.uid}/${item._id}`);
+        try{
+            await set(favoriteRef,item);
+            updateIsFavorited(true);
+        } catch(error){
+            console.log("unable to add to favorites",error.message);
+        }
     }
 
     function onCloseModal() {
@@ -83,7 +100,7 @@ export default function ViewItem() {
 
             <View style={styles.gallery}>
                 <Image
-                    source={{uri: item.uri}}
+                    source={{uri: item.image}}
                     resizeMode="contain"
                     style={styles.mainImage}
                 />
@@ -111,15 +128,15 @@ export default function ViewItem() {
                     <Text style={{color:"white", textAlign:'center', fontSize: 20}}>Add to bag</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.btn, styles.favorite]} onPress={onFavorite}>
-                    <Text style={{color:GlobalStyles.primaryBlack, marginRight: 5, fontSize:20}}>Favorite</Text>
-                    <Ionicons name='heart-outline' size={25} color={GlobalStyles.primaryBlack}/>
+                    <Text style={{color:GlobalStyles.primaryBlack, marginRight: 5, fontSize:20}}>{isFavorited?'You favorited this item':'Favorite'}</Text>
+                    <Ionicons name={isFavorited?'heart':'heart-outline'} size={25} color={isFavorited?'red':GlobalStyles.primaryBlack}/>
                 </TouchableOpacity>
             </View>
             <View style={styles.headerWrapper}>
                 <Text style={styles.itemHeader}>Available Colors</Text>
                 <View style={styles.colorContainer}>
                     {
-                        colorCodes.map((color)=> (
+                        item.colors.map((color)=> (
                             <Pressable 
                                 onPress={onSelectColor(color)} 
                                 key={color} 
@@ -135,7 +152,7 @@ export default function ViewItem() {
                 <Text style={styles.itemHeader}>Select Size</Text>
                 <View style={styles.sizeWrapper}>
                     {
-                        sizes.map(size => (
+                        item.sizes.map(size => (
                             <Pressable onPress={onSelectSize(size)} key={size} style={[styles.sizeItem, {backgroundColor: pickedSize === size?GlobalStyles.primaryBlack:'white'}]}>
                                 <Text style={[styles.sizeText, {color:pickedSize === size?'white':GlobalStyles.primaryBlack}]}>{size.toUpperCase()}</Text>
                             </Pressable>
@@ -145,14 +162,14 @@ export default function ViewItem() {
             </View>
             <View style={styles.headerWrapper}>
                 <Text style={styles.itemHeader}>Description</Text>
-                <Text style={styles.itemText}>Nostrud commodo nulla sunt enim veniam. Minim in sit anim anim occaecat amet qui occaecat duis. Lorem labore ipsum et nostrud magna voluptate quis consectetur commodo enim. Ipsum cillum elit enim sint minim.</Text>
+                <Text style={styles.itemText}>{item.description}</Text>
             </View>
             <View style={styles.headerWrapper}>
                 <Text style={styles.itemHeader}>Ratings & Reviews</Text>
                 <Ratings/>
             </View>
         </ScrollView>
-    )
+    );
 }
 
 

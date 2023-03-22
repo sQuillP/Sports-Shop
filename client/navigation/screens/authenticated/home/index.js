@@ -58,9 +58,7 @@ export default function Home() {
                         renderItem={({item})=> {
                             return (
                                 <ItemCard
-                                    uri={item.image}
-                                    name={item.name}
-                                    price={item.price}
+                                    item ={item}
                                 />
                             );
                         }}
@@ -95,9 +93,7 @@ export default function Home() {
                         renderItem={({item})=> {
                             return (
                                 <ItemCard
-                                    uri={item.image}
-                                    name={item.name}
-                                    price={item.price}
+                                    item={item}
                                 />
                             );
                         }}
@@ -113,9 +109,7 @@ export default function Home() {
                         renderItem={({item})=> {
                             return (
                                 <ItemCard
-                                    uri={item.image}
-                                    name={item.name}
-                                    price={item.price}
+                                    item={item}
                                 />
                             );
                         }}

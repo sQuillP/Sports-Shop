@@ -43,10 +43,11 @@ export default function SignUp() {
         try{
             const response = await createUserWithEmailAndPassword(auth,form.email,form.password);
             const user = response.user;
-            console.log(user);
             dispatch(signUp(user));
-
             //write new user to database
+            //remove the password field
+            delete form.password;
+            //write new user to db
             await set(ref(db,`/users/${user.uid}`),form);
         } catch(error) {
             console.log(error.message);

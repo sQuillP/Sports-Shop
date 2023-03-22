@@ -34,10 +34,11 @@ export default function Login() {
     async function onLogin(credentials) {
         console.log(credentials)
         try{
-            const response = await signInWithEmailAndPassword(auth,credentials.email, credentials.password);
+            const response = await signInWithEmailAndPassword(auth,credentials.Email, credentials.Password);
             const user = response.user;
             dispatch(login(user));
         } catch(error){
+            console.log(error.message);
             console.log('unable to sign in');
         }
     }

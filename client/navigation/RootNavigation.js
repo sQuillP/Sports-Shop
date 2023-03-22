@@ -12,13 +12,13 @@ const Stack = createNativeStackNavigator();
 
 export default function RootNavigation() {
 
-    const {token} = useSelector((store)=> store.auth);
+    const {user} = useSelector((store)=> store.auth);
     
 
     return (
         <Stack.Navigator>
 
-            {token ? 
+            {user ? 
                 (<>
                     <Stack.Screen
                         options={{
