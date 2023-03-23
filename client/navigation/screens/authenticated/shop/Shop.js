@@ -21,7 +21,6 @@ export default function Shop() {
     const { category, fetchingResults, items } = useSelector((store)=> store.category);
     const {width} = Dimensions.get('window');
     const [itemData, updateItemData] = useState([]);
-    console.log(fetchingResults)
     useEffect(()=> {
         updateItemData(items)
     }, [items]);
@@ -30,12 +29,15 @@ export default function Shop() {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={{flex: 1}}>
             {
-                (fetchingResults)?(
+                (fetchingResults)&&(
                     <View style={styles.loader}>
                         <ActivityIndicator size={'large'} color={GlobalStyles.primaryBlack}/>
                         <Text>Fetching...</Text>
                     </View>
-                ):(
+                )
+            }
+            {
+                (!fetchingResults && !!itemData.length) &&(
                     <FlatList
                         columnWrapperStyle={{justifyContent:'space-around'}}
                         data={items}
@@ -49,6 +51,14 @@ export default function Shop() {
                             );
                         }}
                     />
+                )
+            }
+            {
+                (!fetchingResults && !itemData.length) && (
+                    <View style={styles.noItems}>
+                        <Text style={styles.errorTitle}>Network error</Text>
+                        <Text style={styles.errorDescription}>Unable to connect to server</Text>
+                    </View>
                 )
             }
 
@@ -67,5 +77,22 @@ const styles = StyleSheet.create({
     },
     greeting: {
 
+    },
+    noItems:{
+        flex: 1,
+        justifyContent:'center',
+        alignItems:'center',
+    },
+    errorTitle: {
+        textAlign:'center',
+        fontSize: 30,
+        color:'lightgray',
+        fontWeight:'bold',
+    },
+    errorDescription: {
+        textAlign:'center',
+        color:'gray',
+        marginVertical:15,
+        
     }
 });

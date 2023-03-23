@@ -16,10 +16,10 @@ import { useEffect } from 'react';
 import { addToFavorites } from '../redux/slice/favoriteSlice';
 import { addToBag } from '../redux/slice/bagSlice';
 
+
+//returns empty array if no value exists
 function toList(obj) {
-
     if(!obj) return [];
-
     let list = [];
     Object.keys(obj).forEach(key=> {
         list.push(obj[key]);
@@ -37,7 +37,7 @@ export default function TabNavigation() {
     const favoriteItemCount = useSelector((store)=> store.favorites.items.length)
     const dispatch = useDispatch();
 
-    // Listen for changes in rtdb
+    // Listen for changes in rtdb with bag and favorited items.
     useEffect(()=> {
         const favoriteRef = ref(db, `/favorites/${user.uid}`);
         const favoritesListener = onValue(favoriteRef,(snapshot)=> {

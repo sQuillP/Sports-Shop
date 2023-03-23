@@ -8,10 +8,8 @@ export default function BagIncrementor({quantity, updateQuantity }) {
 
 
     function onUpdateQuantity(amount) {
-
-        return ()=> {
-            updateQuantity(q => q + amount);
-        }
+        if(amount + quantity < 1) return;
+        return ()=> updateQuantity(amount);
     }
 
     

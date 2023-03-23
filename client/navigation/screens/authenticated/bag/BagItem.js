@@ -1,51 +1,93 @@
-import { StyleSheet, View, Image , Text, Pressable} from "react-native";
+import { StyleSheet, View, Image , Text, Pressable, Alert} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import BagIncrementor from "./BagIncrementor";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { ref, runTransaction } from "firebase/database";
+import { db } from "../../../../firebase/firebase.config";
+import formatSize from "../../../../util/formatSize";
+import {set} from 'firebase/database';
+
 
 function formatText(text, len) {
+    console.log(text.length)
     if(text.length < len){
-        return text.substring(0, len) + "...";
+        return text;
     }
-    return text;
+    return text.substring(0, len) + "...";
+
 }
 
-export default function BagItem({uri, name,  description="This is the description of the item", price, quantity}) {
+export default function BagItem({item}) {
 
     const navigation = useNavigation();
+    const { user } = useSelector((store)=> store.auth);
 
     const dispatch = useDispatch();
 
-    const [itemQuantity, updateQuantity] = useState(quantity);
+    const [itemQuantity, updateQuantity] = useState(item.quantity);
 
-    console.log(uri);
     function onNavigate() {
         //this might be changed like using an id instead.
-        navigation.navigate('ViewItem',{item: {uri,description,price}});
+        navigation.navigate('ViewItem',{item});
+    }
 
+
+    function onIncrement(amount) {
+        //location format goes id_color_size
+        const itemLocation = `/bag/${user.uid}/${item._id}_${item.pickedColor}_${formatSize(item.pickedSize)}`;
+        const itemRef = ref(db,itemLocation);
+        runTransaction(itemRef,(bagItem)=> {
+            if(bagItem) {
+                bagItem.quantity += amount;
+            }
+            return bagItem;
+        });
+    }
+
+    async function onRemove() {
+
+    }
+
+    async function removeItem() {
+        const itemLocation = `/bag/${user.uid}/${item._id}_${item.pickedColor}_${formatSize(item.pickedSize)}`;
+        const itemRef = ref(db, itemLocation);
+        // console.log(refVal)
+        try{
+            await set(itemRef,null);
+            Alert.alert("Successfully removed item from cart",
+            "You can continue shopping for more products");
+
+        } catch(error) {
+            Alert.alert("Unable to remove item from cart",
+            "There seems to be a network connection issue =(");
+            console.log('in BagItem: unable to remove item: ',error.message);
+        }
     }
 
     return (
         <Pressable onPress={onNavigate} style={styles.container}>
             <View style={styles.itemTop}>
-                <Image source={{uri}} resizeMode="cover" style={styles.image}/>
+                <Image source={{uri:item.image}} resizeMode="cover" style={styles.image}/>
                 <View style={styles.itemContent}>
-                    <Text style={styles.title}>{name}</Text>
-                    <Text style={styles.info}>{formatText(description)}</Text>
+                    <Text style={styles.title}>{item.name}</Text>
+                    <Text style={styles.info}>{formatText(item.description,100)}</Text>
                     <Text style={styles.info}>Size 9</Text>
                     <View style={{flexDirection:'row'}}>
                         <Text style={styles.info}>Color:  </Text>
-                        <View style={[styles.color, {backgroundColor: 'green'}]}></View>
+                        <View style={[styles.color, {backgroundColor: item.pickedColor}]}></View>
                     </View>
                 </View>
             </View>
             <View style={styles.itemBottom}>
                 <BagIncrementor
-                    quantity={itemQuantity}
-                    updateQuantity={updateQuantity}
+                    quantity={item.quantity}
+                    updateQuantity={onIncrement}
                 />
-                <Text style={styles.price}>$123</Text>
+                <Pressable onPress={removeItem}>
+                    <Text>Remove</Text>
+                </Pressable>
+                <Text style={styles.price}>${item.price}</Text>
             </View>
         </Pressable>
     );

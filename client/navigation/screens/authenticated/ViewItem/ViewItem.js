@@ -39,7 +39,6 @@ export default function ViewItem() {
     },[]);
 
     function onSelectColor(color) {
-
         return ()=> updatePickedColor(color);
     }
 
@@ -95,7 +94,7 @@ export default function ViewItem() {
                     updateShowModal(false);
                 }}
             >
-                <ModalContent closeModal={onCloseModal}/>
+                <ModalContent success={successAdd} closeModal={onCloseModal}/>
             </Modal>
 
             <View style={styles.gallery}>

@@ -3,47 +3,67 @@ import { useSelector } from "react-redux";
 import { GlobalStyles } from "../../../../globals/styles";
 import BagItem from "./BagItem";
 import { AntDesign } from '@expo/vector-icons'; 
+import { FontAwesome5 } from '@expo/vector-icons'; 
 import { useNavigation } from "@react-navigation/native";
 import Checkout from "../checkout/Checkout";
-import {db} from "../../../../firebase/firebase.config";
-
-const itemData1 = [
-    {name:"Nike Air Jordan 1 Mid", quantity:1, price: 125, uri:'https://static.nike.com/a/images/t_PDP_1728_v1/0e7fc8f3-76b7-4631-b147-4dad4b1ff241/air-jordan-1-mid-shoes-X5pM09.png', id:1},
-    {name:"Nike Air Jordan 1 Mid", quantity:1, price: 125, uri:'https://static.nike.com/a/images/t_PDP_1728_v1/0e7fc8f3-76b7-4631-b147-4dad4b1ff241/air-jordan-1-mid-shoes-X5pM09.png', id:2},
-    {name:"Nike Air Jordan 1 Mid", quantity:1, price: 125, uri:'https://static.nike.com/a/images/t_PDP_1728_v1/0e7fc8f3-76b7-4631-b147-4dad4b1ff241/air-jordan-1-mid-shoes-X5pM09.png', id:3},
-    {name:"Nike Air Jordan 1 Mid", quantity:1, price: 125, uri:'https://static.nike.com/a/images/t_PDP_1728_v1/0e7fc8f3-76b7-4631-b147-4dad4b1ff241/air-jordan-1-mid-shoes-X5pM09.png', id:4},
-];
+import { useState, useEffect } from "react";
 
 export default function Bag() {
 
-    const {items} = useSelector((store)=> store.bag)
+    const {items} = useSelector((store)=> store.bag);
     const navigator = useNavigation();
+    const [totalCost, updateTotalCost] = useState(0);
+    useEffect(()=> {
+        const totalCost = items.reduce((priceSum, curItem)=> priceSum + (curItem.price * curItem.quantity), 0.0);
+        updateTotalCost(totalCost);
+    },[items]);
 
 
     function onCheckout() {
         navigator.navigate('Checkout');
     }
 
+    function onNavigate(){
+        navigator.navigate('Shop')
+    }
+
     return (
         <View style={styles.container}>
-            <View style={styles.cart}>
-                <FlatList
-                    data={itemData1}
-                    renderItem={({item})=>{
-                        return <BagItem {...item}/>
-                    }}
-                    keyExtractor={(item)=>{
-                        return item.id
-                    }}
-                />
-            </View>
-            <View style={styles.footer}>
-                <View style={styles.checkoutTitle}>
-                    <Text style={styles.footerTitle}>Total Amount</Text>
-                    <Text style={styles.footerTitle}>$232</Text>
-                </View>
-                <Checkout/>
-            </View>
+            {
+                (!!items.length)?(
+                    <>
+                        <View style={styles.cart}>
+                        <FlatList
+                            data={items}
+                            renderItem={({item})=>{
+                                return <BagItem item={item}/>
+                            }}
+                            keyExtractor={(item)=>{
+                                return item._id
+                            }}
+                        />
+                        </View>
+                        <View style={styles.footer}>
+                            <View style={styles.checkoutTitle}>
+                                <Text style={styles.footerTitle}>Total Amount</Text>
+                                <Text style={styles.footerTitle}>${totalCost}</Text>
+                            </View>
+                        <Checkout paymentAmount={totalCost}/>
+                        </View>
+                    </>
+                ):
+                (!items.length)&&(
+                    <View style={styles.noCart}>
+                        <Text style={styles.noCartHeader}>No Items in cart</Text>
+                        <FontAwesome5 style={{marginVertical: 20}} name="sad-cry" size={30} color="gray" />
+                        <Text style={styles.noCartDescription}>Tap to start shopping!</Text>
+                        <TouchableOpacity onPress={onNavigate} style={styles.btn}>
+                            <Text style={styles.btnText}>Shop Now</Text>
+                            <AntDesign name="right" size={24} color="white" />
+                        </TouchableOpacity>
+                    </View>
+                ) 
+            }
         </View>
     );
 }
@@ -74,6 +94,15 @@ const styles = StyleSheet.create({
         justifyContent:'center',
         alignItems:'center'
     },
+    btn: {
+        borderRadius: 15,
+        backgroundColor:GlobalStyles.primaryBlack,
+        paddingVertical:10,
+        width: '50%',
+        flexDirection:'row',
+        justifyContent:'center',
+        alignItems:'center'
+    },
     btnText: {
         color:'white',
         textAlign:'center',
@@ -87,5 +116,21 @@ const styles = StyleSheet.create({
     },
     footerTitle: {
         fontSize: 25
+    },
+    noCart: {
+        flex: 1,
+        justifyContent:'center',
+        alignItems:'center',
+    },
+    noCartHeader: {
+        fontSize:30,
+        fontWeight:'bold',
+        textAlign:'center',
+        color:'gray'
+    },
+    noCartDescription: {
+        marginVertical:15,
+        textAlign:'center',
+        fontSize:20
     }
 });

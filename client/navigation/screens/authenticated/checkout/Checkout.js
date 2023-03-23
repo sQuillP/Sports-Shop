@@ -3,27 +3,36 @@ import { useState, useEffect } from "react";
 import { Alert, StyleSheet, TouchableOpacity, Text } from "react-native";
 import { GlobalStyles } from "../../../../globals/styles";
 import { AntDesign } from '@expo/vector-icons';
+import axios from 'axios';
+import { db } from '../../../../firebase/firebase.config';
+import {ref, set} from 'firebase/database';
+import { useSelector } from "react-redux";
 
 const API_URL = "http://10.0.2.2:3000"
 
-export default function Checkout() {
+export default function Checkout({paymentAmount}) {
     
     const { initPaymentSheet, presentPaymentSheet } = useStripe();
     const [loading, setLoading] = useState(false);
+    const { user } = useSelector((store)=> store.auth);
   
     const fetchPaymentSheetParams = async () => {
       try{
-        const response = await fetch(`${API_URL}/payment-sheet`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
+       
+        const res = await axios.post(`${API_URL}/payment-sheet`, {
+          params: {
+            amount:paymentAmount
           },
+          headers: {
+            'Content-Type':'application/json'
+          },
+          method:"POST"
         });
-        const { paymentIntent, ephemeralKey, customer} = await response.json();
+        const { paymentIntent, ephemeralKey, customer } =  res.data
         return {
           paymentIntent,
           ephemeralKey,
-          customer,
+          customer
         };
       } catch(error) {
         console.log(error.message);
@@ -57,6 +66,7 @@ export default function Checkout() {
   
     const openPaymentSheet = async () => {
         if(!loading) return;
+        console.log('payment sheet')
         const { error } = await presentPaymentSheet();
         if (error) {
             if(error.code.toLowerCase() === 'canceled')
@@ -67,7 +77,13 @@ export default function Checkout() {
             Alert.alert('Success', 'Your order is confirmed!');
             //clear the cart and all items
             //Get a new payment sheet/payment intent, you cannot use the same payment intent
-            await initializePaymentSheet();
+            const dbRef = ref(db,`/bag/${user.uid}`);
+            try {
+              await set(dbRef,null);
+              await initializePaymentSheet();
+            } catch(error) {
+              console.log('Unable to clear cart: ', error.message);
+            }
         }
     };
 

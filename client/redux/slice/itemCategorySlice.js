@@ -4,10 +4,14 @@ import axios from 'axios';
 
 
 export const searchItem = createAsyncThunk("itemCategory/searchItem", async (category, ThunkApi)=> {
-    console.log(category.name)
     const URL = "http://10.0.2.2:3000/items"
-    const response = await axios.get(`${URL}/${category.name}`,category.options);
-    return response.data.data;
+    try{
+        const response = await axios.get(`${URL}/${category.name}`,{...category.options, timeout: 10000},);
+        return response.data.data;
+    } catch(error) {
+        console.log("in thunk: ", error.message);
+        return ThunkApi.rejectWithValue([]);
+    }
 });
 
 
@@ -35,6 +39,11 @@ const itemCategorySlice = createSlice({
         builder.addCase(searchItem.pending,(state,action)=> {
             state.fetchingResults = true;
         });
+
+        builder.addCase(searchItem.rejected,(state,action)=> {
+            state.items = action.payload;
+            state.fetchingResults = false;
+        })
     }
 });
 
