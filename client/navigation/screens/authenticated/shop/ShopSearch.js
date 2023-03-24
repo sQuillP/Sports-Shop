@@ -7,6 +7,8 @@ import CategoryChip from "./CategoryChip";
 import { useDispatch } from "react-redux";
 import { changeCategory } from "../../../../redux/slice/itemCategorySlice";
 import { searchItem } from "../../../../redux/slice/itemCategorySlice";
+import axios from 'axios';
+
 
 const categories = [
     {name:'Shoes', selection:'shoes', id: 1},
@@ -14,12 +16,35 @@ const categories = [
     {name:'Sports Gear', selection:'equipment', id: 3},
 ];
 
+
+function useDebounce(term, delay){
+    const [debouncedTerm, updateDebouncedTerm] = useState(term)
+
+    useEffect(()=> {
+        const timeout = setTimeout(()=> {
+            updateDebouncedTerm(term);
+        }, delay)
+        return ()=> clearTimeout(timeout);
+    },[term, delay]);
+
+    return debouncedTerm;
+}
+
+
+
 export default function ShopSearch(){
 
     const [searchTerm, updateSearchTerm] = useState('');
+    const debouncedTerm = useDebounce(searchTerm, 1000);
     const [category, updateSelectedCategory] = useState('shoes');
     const navigation = useNavigation();
     const dispatch = useDispatch();
+
+    useEffect(()=> {
+        if(!debouncedTerm) return;
+
+        dispatch(searchItem({name:category, options:{params:{limit:25, name:debouncedTerm}}}))
+    },[debouncedTerm]);
 
     useEffect(()=> {
         dispatch(searchItem({name:category, options:{limit:25}}));

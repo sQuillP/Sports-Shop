@@ -15,18 +15,12 @@ export default function Checkout({paymentAmount}) {
     const { initPaymentSheet, presentPaymentSheet } = useStripe();
     const [loading, setLoading] = useState(false);
     const { user } = useSelector((store)=> store.auth);
-  
+
+
     const fetchPaymentSheetParams = async () => {
       try{
-       
         const res = await axios.post(`${API_URL}/payment-sheet`, {
-          params: {
-            amount:paymentAmount
-          },
-          headers: {
-            'Content-Type':'application/json'
-          },
-          method:"POST"
+          amount:paymentAmount
         });
         const { paymentIntent, ephemeralKey, customer } =  res.data
         return {
@@ -35,7 +29,7 @@ export default function Checkout({paymentAmount}) {
           customer
         };
       } catch(error) {
-        console.log(error.message);
+        console.log('in fetchpaymentsheetparams',error.message);
       }
     };
   
@@ -53,7 +47,7 @@ export default function Checkout({paymentAmount}) {
         customerEphemeralKeySecret: ephemeralKey,
         paymentIntentClientSecret: paymentIntent,
         /*  Set `allowsDelayedPaymentMethods` to true if your business can handle payment
-            methods that complete payment after a delay, like SEPA Debit and Sofort*/
+             methods that complete payment after a delay, like SEPA Debit and Sofort*/
         allowsDelayedPaymentMethods: true,
         defaultBillingDetails: {
           name: 'Jane Doe',
@@ -88,8 +82,9 @@ export default function Checkout({paymentAmount}) {
     };
 
     useEffect(() => {
-      initializePaymentSheet();
-    }, []);
+      if(paymentAmount)
+        initializePaymentSheet();
+    }, [paymentAmount]);
   
     return (
         <TouchableOpacity

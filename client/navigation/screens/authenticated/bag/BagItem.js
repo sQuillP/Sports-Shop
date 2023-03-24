@@ -45,9 +45,6 @@ export default function BagItem({item}) {
         });
     }
 
-    async function onRemove() {
-
-    }
 
     async function removeItem() {
         const itemLocation = `/bag/${user.uid}/${item._id}_${item.pickedColor}_${formatSize(item.pickedSize)}`;
@@ -96,7 +93,7 @@ export default function BagItem({item}) {
 
 const styles = StyleSheet.create({
     container: {
-        paddingVertical: 10,
+        padding: 10,
         borderBottomWidth: 2,
         borderBottomColor:'lightgray',
     },
@@ -112,7 +109,8 @@ const styles = StyleSheet.create({
         width: 125
     },
     itemContent: {
-        paddingLeft: 10
+        paddingLeft: 10,
+        width:'71%'
     },
     info:{
         color:'gray'

@@ -56,8 +56,8 @@ export default function Shop() {
             {
                 (!fetchingResults && !itemData.length) && (
                     <View style={styles.noItems}>
-                        <Text style={styles.errorTitle}>Network error</Text>
-                        <Text style={styles.errorDescription}>Unable to connect to server</Text>
+                        <Text style={styles.errorTitle}>No data available</Text>
+                        <Text style={styles.errorDescription}>Check your network connection or your recent search terms</Text>
                     </View>
                 )
             }

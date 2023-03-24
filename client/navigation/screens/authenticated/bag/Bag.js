@@ -7,15 +7,18 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native";
 import Checkout from "../checkout/Checkout";
 import { useState, useEffect } from "react";
+import formatSize from "../../../../util/formatSize";
+
 
 export default function Bag() {
 
     const {items} = useSelector((store)=> store.bag);
     const navigator = useNavigation();
     const [totalCost, updateTotalCost] = useState(0);
+    const { user }  = useSelector((store)=> store.auth);
     useEffect(()=> {
         const totalCost = items.reduce((priceSum, curItem)=> priceSum + (curItem.price * curItem.quantity), 0.0);
-        updateTotalCost(totalCost);
+        updateTotalCost(totalCost.toFixed(2));
     },[items]);
 
 
@@ -39,9 +42,10 @@ export default function Bag() {
                                 return <BagItem item={item}/>
                             }}
                             keyExtractor={(item)=>{
-                                return item._id
+                                return `${user.uid}/${item._id}_${item.pickedColor}_${formatSize(item.pickedSize)}`
+                                
                             }}
-                        />
+                        /> 
                         </View>
                         <View style={styles.footer}>
                             <View style={styles.checkoutTitle}>
